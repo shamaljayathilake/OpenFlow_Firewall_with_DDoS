@@ -1,0 +1,266 @@
+{
+	"info": {
+		"_postman_id": "f7c52f83-2986-4a6b-8e80-a57f8cfec017",
+		"name": "sdnApiTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://10.15.3.10:8181/restconf/operational/network-topology:network-topology",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.15.3.10:8181/restconf/operational/network-topology:network-topology",
+					"protocol": "http",
+					"host": [
+						"10",
+						"15",
+						"3",
+						"10"
+					],
+					"port": "8181",
+					"path": [
+						"restconf",
+						"operational",
+						"network-topology:network-topology"
+					]
+				},
+				"description": "Network topology "
+			},
+			"response": []
+		},
+		{
+			"name": "http://10.15.3.10:8181/restconf/operational/network-topology:network-topology",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.15.3.10:8181/restconf/operational/opendaylight-inventory:nodes/node/openflow:1",
+					"protocol": "http",
+					"host": [
+						"10",
+						"15",
+						"3",
+						"10"
+					],
+					"port": "8181",
+					"path": [
+						"restconf",
+						"operational",
+						"opendaylight-inventory:nodes",
+						"node",
+						"openflow:1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://10.15.3.10:8181/restconf/operations/sal-flow:add-flow",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<input xmlns=\"urn:opendaylight:flow:service\">\r\n    <node xmlns:inv=\"urn:opendaylight:inventory\">/inv:nodes/inv:node[inv:id=\"openflow:1\"]</node>\r\n    <table_id>0</table_id>\r\n    <cookie>3</cookie>\r\n    <priority>99</priority>\r\n    <match>\r\n        <ethernet-match>\r\n            <ethernet-type>\r\n                <type>2048</type>\r\n            </ethernet-type>\r\n        </ethernet-match>\r\n        <ipv4-destination>10.0.0.4/32</ipv4-destination>\r\n    </match>\r\n    <instructions>\r\n        <instruction>\r\n            <order>0</order>\r\n            <apply-actions>\r\n                <action>\r\n                    <order>0</order>\r\n                    <drop-action/>\r\n                </action>\r\n            </apply-actions>\r\n        </instruction>\r\n    </instructions>\r\n</input>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.15.3.10:8181/restconf/operations/sal-flow:add-flow",
+					"protocol": "http",
+					"host": [
+						"10",
+						"15",
+						"3",
+						"10"
+					],
+					"port": "8181",
+					"path": [
+						"restconf",
+						"operations",
+						"sal-flow:add-flow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://10.15.3.10:8181/restconf/operations/sal-flow:remove-flow",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<input xmlns=\"urn:opendaylight:flow:service\">\r\n    <node xmlns:inv=\"urn:opendaylight:inventory\">/inv:nodes/inv:node[inv:id=\"openflow:1\"]</node>\r\n    <table_id>0</table_id>\r\n    <cookie>3</cookie>\r\n    <priority>99</priority>\r\n    <match>\r\n        <ethernet-match>\r\n            <ethernet-type>\r\n                <type>2048</type>\r\n            </ethernet-type>\r\n        </ethernet-match>\r\n        <ipv4-destination>10.0.0.4/32</ipv4-destination>\r\n    </match>\r\n    <instructions>\r\n        <instruction>\r\n            <order>0</order>\r\n            <apply-actions>\r\n                <action>\r\n                    <order>0</order>\r\n                    <drop-action/>\r\n                </action>\r\n            </apply-actions>\r\n        </instruction>\r\n    </instructions>\r\n</input>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.15.3.10:8181/restconf/operations/sal-flow:remove-flow",
+					"protocol": "http",
+					"host": [
+						"10",
+						"15",
+						"3",
+						"10"
+					],
+					"port": "8181",
+					"path": [
+						"restconf",
+						"operations",
+						"sal-flow:remove-flow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://10.15.3.10:8181/restconf/config/opendaylight-inventory:nodes/node/openflow:1/group/2",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<group xmlns=\"urn:opendaylight:flow:inventory\">\r\n  <group-type>group-select</group-type>\r\n  <buckets>\r\n      <bucket>\r\n       <weight>1</weight>\r\n          <action>\r\n              <output-action>\r\n                  <output-node-connector>1</output-node-connector>\r\n              </output-action>\r\n              <order>1</order>\r\n          </action>\r\n          <bucket-id>1</bucket-id>\r\n      </bucket>\r\n      <bucket>\r\n        <weight>1</weight>\r\n          <action>\r\n              <output-action>\r\n                  <output-node-connector>2</output-node-connector>\r\n              </output-action>\r\n              <order>1</order>\r\n          </action>\r\n          <bucket-id>2</bucket-id>\r\n      </bucket>\r\n  </buckets>\r\n  <barrier>false</barrier>\r\n  <group-name>SelectGroup</group-name>\r\n  <group-id>2</group-id>\r\n</group>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.15.3.10:8181/restconf/config/opendaylight-inventory:nodes/node/openflow:1/group/2",
+					"protocol": "http",
+					"host": [
+						"10",
+						"15",
+						"3",
+						"10"
+					],
+					"port": "8181",
+					"path": [
+						"restconf",
+						"config",
+						"opendaylight-inventory:nodes",
+						"node",
+						"openflow:1",
+						"group",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://10.15.3.10:8181/restconf/operational/opendaylight-inventory:nodes/node/openflow:1/group/2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.15.3.10:8181/restconf/operational/opendaylight-inventory:nodes/node/openflow:1/group/2",
+					"protocol": "http",
+					"host": [
+						"10",
+						"15",
+						"3",
+						"10"
+					],
+					"port": "8181",
+					"path": [
+						"restconf",
+						"operational",
+						"opendaylight-inventory:nodes",
+						"node",
+						"openflow:1",
+						"group",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

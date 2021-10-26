@@ -1,0 +1,9 @@
+Shamal 
+
+https://docs.opendaylight.org/projects/openflowplugin/en/latest/users/operation.html#deleting-flows-from-config-datastore
+https://docs.opendaylight.org/projects/openflowplugin/en/latest/users/flow-examples.html?highlight=action#ethernet-src-dest-addresses-ipv4-src-dest-addresses-input-port
+
+Mininet and Openday light
+
+sudo -E karaf
+sudo mn --mac --topo=tree,3 --controller=remote,ip=10.15.3.y,port=6633 --switchovs,protocols=OpenFlow13
