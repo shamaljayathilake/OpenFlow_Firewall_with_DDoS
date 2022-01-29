@@ -36,7 +36,7 @@ def showData():
                 if i["opendaylight-flow-table-statistics:flow-table-statistics"]["active-flows"] != 0:
                     switchData.append([data2["nodes"]["node"][switch]["id"],i["id"],i["opendaylight-flow-table-statistics:flow-table-statistics"]["active-flows"],i["opendaylight-flow-table-statistics:flow-table-statistics"]["packets-looked-up"],i["opendaylight-flow-table-statistics:flow-table-statistics"]["packets-matched"]])
 
-    return render_template("scj_page.html", user=current_user, nodeData = nodeDetailsList,switchData=switchData)
+    return render_template("home.html", user=current_user, nodeData = nodeDetailsList,switchData=switchData)
 
 
 
@@ -72,6 +72,7 @@ dataLayoutDic = {
 jsonData = dataLayoutDic
 addFlowUrl = f"http://{getenv('SERVER_IP')}:{getenv('PORT')}/restconf/operations/sal-flow:add-flow"
 removeFlowUrl = f"http://{getenv('SERVER_IP')}:{getenv('PORT')}/restconf/operations/sal-flow:remove-flow"
+putMeterTable = f"http://{getenv('SERVER_IP')}:{getenv('PORT')}/restconf/config/opendaylight-inventory:nodes/node/"
 headers = {'Content-Type': 'application/json'}
 
 @apis.route('/addFlow', methods=['GET', 'POST'])
@@ -83,10 +84,13 @@ def addFlow():
         if switch == "0":
             tempData = copy.deepcopy(jsonData)
             tempData['input']["priority"] = request.form.get('priority')
-            if request.form.get('action') == "1":
-                tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"output-action": {"output-node-connector": "ALL","max-length": 60}}]
+            if request.form.get('meter') != "None":
+                meterId = request.form.get('meter')
             else:
-                tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"drop-action": {}}]
+                if request.form.get('action') == "1":
+                    tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"output-action": {"output-node-connector": "ALL","max-length": 60}}]
+                else:
+                    tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"drop-action": {}}]
             count =0
             if request.form.get('dstIP')!="None":
                 count =1
@@ -241,3 +245,93 @@ def showFlows():
                             count+=1
 
     return render_template("flows.html", user=current_user, switchData=switchData , switchCount = nodesCount )
+
+
+@apis.route('/show_meters', methods=['GET', 'POST'])
+@login_required
+def showMeters():
+    url=f"http://{getenv('SERVER_IP')}:{getenv('PORT')}/{getenv('ENDPOINT')}/opendaylight-inventory:nodes"
+    response = requests.get(url, auth=HTTPBasicAuth("admin","admin"))
+    data2=response.json()
+    if data2:
+        nodesCount = len(data2["nodes"]["node"])
+        session['switch-count'] = nodesCount
+        meterData=[]
+        for switch in range(0,nodesCount):
+            if "flow-node-inventory:meter" in data2["nodes"]["node"][switch]:
+                for count in range(len(data2["nodes"]["node"][switch]["flow-node-inventory:meter"])):
+                    switchName = data2["nodes"]["node"][switch]["id"]
+                    meterId =data2["nodes"]["node"][switch]["flow-node-inventory:meter"][count]["meter-id"]
+                    dropRate = data2["nodes"]["node"][switch]["flow-node-inventory:meter"][count]["meter-band-headers"]["meter-band-header"][0]['drop-rate']
+                    dropBurstSize = data2["nodes"]["node"][switch]["flow-node-inventory:meter"][count]["meter-band-headers"]["meter-band-header"][0]['drop-burst-size']
+                    flowCount = data2["nodes"]["node"][switch]["flow-node-inventory:meter"][count]["opendaylight-meter-statistics:meter-statistics"]["flow-count"]
+                    meterData.append([switchName,meterId,dropRate,dropBurstSize,flowCount])
+    return render_template("meter.html", user=current_user , meterData = meterData, switchCount=nodesCount )
+           
+
+meterJson = {
+     "flow-node-inventory:meter": [
+         {
+             "meter-id": 4,
+             "meter-band-headers": {
+                 "meter-band-header": [
+                     {
+                         "band-id": 0,
+                         "drop-rate": 10000,
+                         "drop-burst-size": 0,
+                         "meter-band-types": {
+                             "flags": "ofpmbt-drop"
+                         }
+                     }
+                 ]
+             },
+             "flags": "meter-kbps",
+             "meter-name": "Foo"
+         }
+     ]
+ }
+
+@apis.route('/removeMeter', methods=['GET', 'POST'])
+@login_required
+def removeMeter():
+    if request.method == 'POST':
+        switch = request.form.get("switch")
+        tempData = copy.deepcopy(meterJson)
+        tempData["flow-node-inventory:meter"][0]["meter-id"] = request.form.get('meterID')
+        tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-rate"]= request.form.get('dropRate')
+        tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-burst-size"] = request.form.get('dropBSize')
+        tempDataUrl = putMeterTable+str(switch)+"/meter/"+str(request.form.get('meterID'))
+        sendData = json.dumps(tempData)
+        response = requests.delete(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
+        if response.status_code ==200:
+            flash('Meter Removed', category='success')
+            return redirect(url_for('apis.showMeters'))
+        else:
+            flash('Meter Removing Error', category='error')
+            return redirect(url_for('apis.showMeters'))
+    else:
+        flash('Error', category='error')
+        return redirect(url_for('apis.showMeters'))
+
+@apis.route('/addMeter', methods=['GET', 'POST'])
+@login_required
+def addMeter():
+    if request.method == 'POST':
+        switch = request.form.get("switch")
+        tempData = copy.deepcopy(meterJson)
+        tempData["flow-node-inventory:meter"][0]["meter-id"] = request.form.get('meterID')
+        tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-rate"]= request.form.get('dropRate')
+        tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-burst-size"] = request.form.get('dropBSize')
+        tempDataUrl = putMeterTable+"openflow:"+str(switch)+"/meter/"+str(request.form.get('meterID'))
+        sendData = json.dumps(tempData)
+        response = requests.put(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
+        if response.status_code ==201 or response.status_code ==200 :
+            flash('Meter Added', category='success')
+            return redirect(url_for('apis.showMeters'))
+        else:
+            flash('Meter Adding Error', category='error')
+            return redirect(url_for('apis.showMeters'))
+    else:
+        flash('Error', category='error')
+        return redirect(url_for('apis.showMeters'))
+        
