@@ -84,13 +84,13 @@ def addFlow():
         if switch == "0":
             tempData = copy.deepcopy(jsonData)
             tempData['input']["priority"] = request.form.get('priority')
-            if request.form.get('meter') != "None":
-                meterId = request.form.get('meter')
-            else:
-                if request.form.get('action') == "1":
+            if request.form.get('action') == "1":
+                if request.form.get('meter') == "None":
                     tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"output-action": {"output-node-connector": "ALL","max-length": 60}}]
                 else:
-                    tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"drop-action": {}}]
+                    tempData['input']["instructions"]["instruction"]=[{"order": 0,"meter":{"meter-id":int(request.form.get('meter'))}},{"order": 1,"apply-actions": {"action": [{"output-action": {"output-node-connector": "ALL","max-length": 60},"order": 0}]}}]
+            else:
+                tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"drop-action": {}}]
             count =0
             if request.form.get('dstIP')!="None":
                 count =1
@@ -125,9 +125,10 @@ def addFlow():
             tempData = copy.deepcopy(jsonData)
             tempData['input']["priority"] = request.form.get('priority')
             if request.form.get('action') == "1":
-                tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"output-action": {"output-node-connector": "ALL","max-length": 60}}]
-            else:
-                tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"drop-action": {}}]
+                if request.form.get('meter') == "None":
+                    tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"output-action": {"output-node-connector": "ALL","max-length": 60}}]
+                else:
+                    tempData['input']["instructions"]["instruction"]=[{"order": 0,"meter":{"meter-id":int(request.form.get('meter'))}},{"order": 1,"apply-actions": {"action": [{"output-action": {"output-node-connector": "ALL","max-length": 60},"order": 0}]}}]
             count =0
             if request.form.get('dstIP')!="None":
                 count =1
@@ -170,9 +171,10 @@ def removeFlow():
         tempData = copy.deepcopy(jsonData)
         tempData['input']["priority"] = request.form.get('priority')
         if request.form.get('action') == "Allow":
-            tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"output-action": {"output-node-connector": "ALL","max-length": 60}}]
-        else:
-            tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"drop-action": {}}]
+                if request.form.get('meter') == "None":
+                    tempData['input']["instructions"]["instruction"][0]["apply-actions"]["action"]= [{"order": 0,"output-action": {"output-node-connector": "ALL","max-length": 60}}]
+                else:
+                    tempData['input']["instructions"]["instruction"]=[{"order": 0,"meter":{"meter-id":int(request.form.get('meter'))}},{"order": 1,"apply-actions": {"action": [{"output-action": {"output-node-connector": "ALL","max-length": 60},"order": 0}]}}]
         if request.form.get('dstIP')!="None":
             tempData['input']["match"]["ipv4-destination"] = request.form.get('dstIP')
         if request.form.get('srcIP')!="None":
@@ -239,8 +241,13 @@ def showFlows():
                             elif "ipv4-source" not in flows["match"]:
                                 switchData[count].extend(["None"]) 
                             if "instructions" in flows:
+                                if len(flows["instructions"]["instruction"])==1:
+                                    switchData[count].extend(["None"]) 
+                                else:
+                                    switchData[count].extend([flows["instructions"]["instruction"][0]["meter"]["meter-id"]]) 
                                 switchData[count].extend(["Allow"]) 
                             elif "instructions" not in flows:
+                                switchData[count].extend(["None"]) 
                                 switchData[count].extend(["Deny"]) 
                             count+=1
 
@@ -318,19 +325,36 @@ def removeMeter():
 def addMeter():
     if request.method == 'POST':
         switch = request.form.get("switch")
-        tempData = copy.deepcopy(meterJson)
-        tempData["flow-node-inventory:meter"][0]["meter-id"] = request.form.get('meterID')
-        tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-rate"]= request.form.get('dropRate')
-        tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-burst-size"] = request.form.get('dropBSize')
-        tempDataUrl = putMeterTable+"openflow:"+str(switch)+"/meter/"+str(request.form.get('meterID'))
-        sendData = json.dumps(tempData)
-        response = requests.put(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
-        if response.status_code ==201 or response.status_code ==200 :
-            flash('Meter Added', category='success')
-            return redirect(url_for('apis.showMeters'))
+        switchCount = session.get('switch-count')
+        if switch == "0":
+            tempData = copy.deepcopy(meterJson)
+            tempData["flow-node-inventory:meter"][0]["meter-id"] = request.form.get('meterID')
+            tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-rate"]= request.form.get('dropRate')
+            tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-burst-size"] = request.form.get('dropBSize')
+            for sw in range (1,switchCount+1,1):
+                tempDataUrl = putMeterTable+"openflow:"+str(sw)+"/meter/"+str(request.form.get('meterID'))
+                sendData = json.dumps(tempData)
+                response = requests.put(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
+            if response.status_code ==201 or response.status_code ==200 :
+                flash('Meter Added', category='success')
+                return redirect(url_for('apis.showMeters'))
+            else:
+                flash('Meter Adding Error', category='error')
+                return redirect(url_for('apis.showMeters'))
         else:
-            flash('Meter Adding Error', category='error')
-            return redirect(url_for('apis.showMeters'))
+            tempData = copy.deepcopy(meterJson)
+            tempData["flow-node-inventory:meter"][0]["meter-id"] = request.form.get('meterID')
+            tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-rate"]= request.form.get('dropRate')
+            tempData["flow-node-inventory:meter"][0]["meter-band-headers"]["meter-band-header"][0]["drop-burst-size"] = request.form.get('dropBSize')
+            tempDataUrl = putMeterTable+"openflow:"+str(switch)+"/meter/"+str(request.form.get('meterID'))
+            sendData = json.dumps(tempData)
+            response = requests.put(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
+            if response.status_code ==201 or response.status_code ==200 :
+                flash('Meter Added', category='success')
+                return redirect(url_for('apis.showMeters'))
+            else:
+                flash('Meter Adding Error', category='error')
+                return redirect(url_for('apis.showMeters'))
     else:
         flash('Error', category='error')
         return redirect(url_for('apis.showMeters'))
