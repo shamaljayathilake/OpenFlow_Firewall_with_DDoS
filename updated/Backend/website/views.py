@@ -5,9 +5,6 @@ from . import db
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-from dotenv import load_dotenv
-
-load_dotenv()
 
 views = Blueprint('views', __name__)
 
@@ -50,8 +47,3 @@ def scjPage():
 @login_required
 def postPage():
     return render_template("post_page.html", user=current_user)
-
-@views.route('/flows', methods=['GET', 'POST'])
-@login_required
-def flows():
-    return render_template("flows.html", user=current_user)

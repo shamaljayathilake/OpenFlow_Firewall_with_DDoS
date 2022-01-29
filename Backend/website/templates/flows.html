@@ -1,0 +1,114 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<h1 align="center">Flows</h1>
+<a class="btn btn-success" id="showData" href="/show_flows">Refresh Data</a>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+  Add an ACL Rule
+</button>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add ACL Rule</h5>
+      </div>
+      <div class="modal-body">
+        <form action="/addFlow" method="post">
+          <div  class="form-text text-center">******  Leave non-applicable fields blank ****.</div>
+          <div class="mb-3">
+            <label  class="form-label">Priority</label>
+            <input type="text" class="form-control" id="priority" name="priority" value="99" >
+            <div id="protocolHelp" class="form-text">Enter value between 0-100</div>
+          </div>
+          <div class="mb-3">
+            <label  class="form-label">Destination IP Address</label>
+            <input type="text" class="form-control" id="dstIP" name="dstIP" value="None" >
+          </div>
+          <div class="mb-3">
+            <label  class="form-label">Source IP Address</label>
+            <input type="text" class="form-control" id="srcIP" name="srcIP" value="None">
+          </div>
+          <div class="mb-3">
+            <label  class="form-label">Destination MAC Address</label>
+            <input type="text" class="form-control" id="dstMAC" name="dstMAC" value="None">
+          </div>
+          <div class="mb-3">
+            <label  class="form-label">Source MAC Address</label>
+            <input type="text" class="form-control" id="srcMAC" name="srcMAC" value="None">
+          </div>
+          <div class="mb-3">
+            <label  class="form-label">IP Protocol Number</label>
+            <input type="text" class="form-control" id="ipProtocol" aria-describedby="protocolHelp" name="ipProtocol" value="None">
+            <div id="protocolHelp" class="form-text">Enter protocol number EX: 1 for ICMP, 6 for TCP.</div>
+          </div>
+          <div class="mb-3 ">
+            <label>Select Action</label>
+            <select name="action" id="action" class="form-select">
+              <option value="0">Deny</option>
+              <option value="1">Allow</option>
+            </select>
+          </div>
+          <div class="mb-3 ">
+            <label>Select Switch to Add Flow Entry</label>
+            <select name="switch" id="switch" class="form-select">
+              {%if switchCount%}
+                {% for sNum in range (switchCount) %}
+                <option value = "{{sNum + 1}}"> OpenFlow Switch {{sNum + 1}}</option>
+                {% endfor%}
+              {%endif%}
+              <option value="0">All Switches</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <div class="form-group">
+              <input type="submit" value="Add Rule" class="btn-success btn">
+            </div>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+           
+          </div>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+{%if switchData%}
+<table class="table table-striped table-reponsive">
+  <tr>
+    <th class="col-sm-1">Switch</th>
+    <th class="col-sm-1">Number of Active Flows</th>
+    <th class="col-sm-2">Flow-id</th>
+    <th class="col-sm-2">Priority</th>
+    <th class="col-sm-2">Ethernet-source</th>
+    <th class="col-sm-2">Ethernet-destination</th>
+    <th class="col-sm-2">IP port</th>
+    <th class="col-sm-2">IP Protocol</th>
+    <th class="col-sm-2">IPv4 Destination</th>
+    <th class="col-sm-2">IPv4 Source</th>
+
+  </tr>
+
+  {% for row in switchData %}
+  <tr>
+    <td>{{row.0}}</td>
+    <td>{{row.1}}</td>
+    <td>{{row.2}}</td>
+    <td>{{row.3}}</td>
+    <td>{{row.4}}</td>
+    <td>{{row.5}}</td>
+    <td>{{row.6}}</td>
+    <td>{{row.7}}</td>
+    <td>{{row.8}}</td>
+    <td>{{row.9}}</td>
+  </tr>
+
+  {% endfor %}
+
+  </tbody>
+</table>
+{%endif%}
+
+
+
+{% endblock %}

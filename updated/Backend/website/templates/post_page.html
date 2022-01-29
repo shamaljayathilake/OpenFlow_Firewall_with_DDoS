@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<h1 align="center">Test Page For Post Requests</h1>
+<div>
+<form action="/addFlow" method="post">
+  <div class="form-group">
+  <label>Destination IP</label>
+  <input type="text" id="dstIP" name="dstIP" >
+</div>
+<div class="form-group">
+  <label>Select Switch to Add Flow Entry</label>
+  <select name="switch" id="switch">
+    <option value="0">All Switches</option>
+    <option value="1">OpenFlow Switch 1</option>
+    <option value="2">OpenFlow Switch 2</option>
+  </select><br>
+  </div>
+  <div class="form-group">
+  <input type="submit" value="Add Flow" class="btn-success btn">
+  </div>
+</form>
+</div>
+<div>
+<form action="/removeFlow" method="post">
+  <label>Destination IP</label>
+  <input type="text" id="dstIP" name="dstIP" ><br>
+  <label>Select Switch to Remove Flow Entry</label>
+  <select name="switch" id="switch">
+    <option value="0">All Switches</option>
+    <option value="1">OpenFlow Switch 1</option>
+    <option value="2">OpenFlow Switch 2</option>
+  </select><br>
+  <input type="submit" value="Remove Flow" class="btn-warning btn">
+</form>
+</div>
+{% endblock %}

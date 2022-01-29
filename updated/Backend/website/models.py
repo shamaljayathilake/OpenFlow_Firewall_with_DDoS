@@ -1,9 +1,6 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 class Note(db.Model):
