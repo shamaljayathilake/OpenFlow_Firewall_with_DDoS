@@ -79,9 +79,63 @@
   </div>
 </div>
 {%if switchData%}
+<table class="table table-striped table-reponsive" id="flowTable">
+  <tr>
+    <th class="col-sm-1">Switch</th>
+    <!-- <th class="col-sm-1">Number of Active Flows</th> -->
+    <!-- <th class="col-sm-2">Flow-id</th> -->
+    <th class="col-sm-1">Priority</th>
+    <th class="col-sm-1">Ethernet-source</th>
+    <th class="col-sm-1">Ethernet-destination</th>
+
+    <th class="col-sm-2">IP Protocol</th>
+    <th class="col-sm-2">IPv4 Destination</th>
+    <th class="col-sm-2">IPv4 Source</th>
+    <th class="col-sm-1">Meter</th>
+    <th class="col-sm-1">Actions</th>
+    <th class="col-sm-4">Options</th>
+  </tr>
+
+  {% for row in switchData %}
+  <tr>
+    <td>{{row.0}}</td>
+    <td>{{row.1}}</td>
+    <td>{{row.2}}</td>
+    <td>{{row.3}}</td>
+    <td>{{row.4}}</td>
+    <td>{{row.5}}</td>
+    <td>{{row.6}}</td>
+    <td>{{row.7}}</td>
+    <td>{{row.8}}</td>
+    <!-- <td>{{row.9}}</td> -->
+    <td class="text-right">
+      <div class="row">
+        <div class="col-6">
+          <form method="post" action="/removeFlow">
+            <input type="hidden" id="switch" name="switch" value="{{row.0}}">
+            <input type="hidden" id="priority" name="priority" value="{{row.1}}">
+            <input type="hidden" id="srcMAC" name="srcMAC" value="{{row.2}}">
+            <input type="hidden" id="dstMAC" name="dstMAC" value="{{row.3}}">
+            <input type="hidden" id="ipProtocol" name="ipProtocol" value="{{row.4}}">
+            <input type="hidden" id="dstIP" name="dstIP" value="{{row.5}}">
+            <input type="hidden" id="srcIP" name="srcIP" value="{{row.6}}">
+            <input type="hidden" id="meter" name="meter" value="{{row.7}}">
+            <input type="hidden" id="action" name="action" value="{{row.8}}">
+            <input type="submit" value="Delete" class="btn-danger btn" onclick="return confirm('Are You Sure For Delete?')" >
+          </form>
+        </div>
+  
+      </div>
+  </td>
+  </tr>
+
+  {% endfor %}
+
+  </tbody>
+</table>
 <div class="card mt-3">
   <div class="card-body">
-    <table id="flow" class="table table-striped table-reponsive"></table>
+    <table id="test" class="table table-striped table-reponsive"></table>
   </div>
 </div>
 {%endif%}
@@ -90,10 +144,8 @@
 const dataSet1 = JSON.parse('{{ switchData | tojson }}');
   $(document).ready(function() {
     // Delete a record
-    $('#flow').on('click', 'td.editor-delete', function () {
-      var result = confirm("Want to delete?");
-      if (result) {
-      var table = $('#flow').DataTable();
+    $('#test').on('click', 'td.editor-delete', function () {
+      var table = $('#test').DataTable();
       array=table.row( this ).data()
       var formData = new FormData()
       formData.append("switch",array[0]);
@@ -109,26 +161,8 @@ const dataSet1 = JSON.parse('{{ switchData | tojson }}');
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "/removeFlow");
       xhr.send(formData);
-      xhr.onreadystatechange = (e) => {
-        const obj = JSON.parse(xhr.responseText);
-        if (obj['cat']=='success'){
-          swal({  
-            title: " Nice !!",  
-            text: obj['msg'],  
-            type: 'success',  
-          });  
-        }
-        else{
-          swal({  
-            title: " Ooops !!",  
-            text: obj['msg'],  
-            type: "error",  
-          });
-        }
-}
-    } 
-  });
-    $('#flow').DataTable({
+    } );
+    $('#test').DataTable({
       data: dataSet1,
         columns: [
           { title: "Switch" },

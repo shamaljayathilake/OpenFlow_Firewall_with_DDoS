@@ -189,14 +189,14 @@ def removeFlow():
         sendData = json.dumps(tempData)
         response = requests.post(removeFlowUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
         if response.status_code ==200:
-            flash('Flow removed Successfully', category='success')
-            return redirect(url_for('apis.showFlows'))
+            msg={"cat":"success","msg":"Flow removed Successfully"}
+            return jsonify(msg)
         else:
-            flash('Error !! Please try again', category='error')
-            return redirect(url_for('apis.showFlows'))
+            msg={"cat":"error","msg":"Couldn't Remove the Flow Entry"}
+            return jsonify(msg)
     else:
-        flash('Error !! Please try again', category='error')
-        return redirect(url_for('apis.showFlows'))
+        msg={"cat":"error","msg":"Couldn't Remove the Flow Entry"}
+        return jsonify(msg)
 
 @apis.route('/show_flows', methods=['GET', 'POST'])
 @login_required
@@ -311,14 +311,14 @@ def removeMeter():
         sendData = json.dumps(tempData)
         response = requests.delete(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
         if response.status_code ==200:
-            flash('Meter removed successfully', category='success')
-            return redirect(url_for('apis.showMeters'))
+            msg={"cat":"success","msg":"Meter Removed Successfully"}
+            return jsonify(msg)
         else:
-            flash('Error when removing meter !! Please try again', category='error')
-            return redirect(url_for('apis.showMeters'))
+            msg={"cat":"error","msg":"Error when removing meter !! Please try again"}
+            return jsonify(msg)
     else:
-        flash('Error when removing meter !! Please try again', category='error')
-        return redirect(url_for('apis.showMeters'))
+        msg={"cat":"error","msg":"Error when removing meter !! Please try again"}
+        return jsonify(msg)
 
 @apis.route('/addMeter', methods=['GET', 'POST'])
 @login_required
