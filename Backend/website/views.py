@@ -1,4 +1,4 @@
-from flask import Blueprint,request,render_template, flash, jsonify
+from flask import Blueprint,request,render_template, flash, jsonify,redirect,url_for
 from flask_login import login_required, current_user
 from .models import Note
 from . import db
@@ -26,7 +26,7 @@ def home():
             db.session.commit()
             flash('Note added!', category='success')
 
-    return render_template("home.html", user=current_user)
+    return redirect(url_for('apis.showData'))
 
 
 @views.route('/delete-note', methods=['POST'])

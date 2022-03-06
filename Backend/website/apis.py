@@ -113,13 +113,13 @@ def addFlow():
                     sendData = json.dumps(tempData)
                     response = requests.post(addFlowUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
                 if response.status_code ==200:
-                    flash('Flow Added', category='success')
+                    flash('Flow added successfully ', category='success')
                     return redirect(url_for('apis.showFlows'))
                 else:
-                    flash('Flow Adding Error', category='error')
+                    flash('Error !! Please check the flow configurations and try again', category='error')
                     return redirect(url_for('apis.showFlows'))
             else:
-                flash('NO Flow Data to Add', category='error')
+                flash('Error !! Please add flow configurations and try again', category='error')
                 return redirect(url_for('apis.showFlows'))
         else:
             tempData = copy.deepcopy(jsonData)
@@ -150,16 +150,16 @@ def addFlow():
             if count ==1:
                 response = requests.post(addFlowUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
                 if response.status_code ==200:
-                    flash('Flow Added', category='success')
+                    flash('Flow added successfully', category='success')
                     return redirect(url_for('apis.showFlows'))
                 else:
-                    flash('Flow Adding Error', category='error')
+                    flash('Error !! Please check the flow configurations and try again', category='error')
                     return redirect(url_for('apis.showFlows'))
             else:
-                flash('NO Flow Data to Add', category='error')
+                flash('Error !! Please add flow configurations and try again', category='error')
                 return redirect(url_for('apis.showFlows'))
     else:
-        flash('Error', category='error')
+        flash('Error !! Please try again', category='error')
         return redirect(url_for('apis.showFlows'))
 
 
@@ -189,13 +189,13 @@ def removeFlow():
         sendData = json.dumps(tempData)
         response = requests.post(removeFlowUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
         if response.status_code ==200:
-            flash('Flow Removed', category='success')
+            flash('Flow removed Successfully', category='success')
             return redirect(url_for('apis.showFlows'))
         else:
-            flash('Flow Removing Error', category='error')
+            flash('Error !! Please try again', category='error')
             return redirect(url_for('apis.showFlows'))
     else:
-        flash('Error', category='error')
+        flash('Error !! Please try again', category='error')
         return redirect(url_for('apis.showFlows'))
 
 @apis.route('/show_flows', methods=['GET', 'POST'])
@@ -213,7 +213,7 @@ def showFlows():
             for i in data2["nodes"]["node"][switch]["flow-node-inventory:table"]:
                 if i["opendaylight-flow-table-statistics:flow-table-statistics"]["active-flows"] != 0:
                     for flows in i["flow"]:
-                        if  flows["priority"] in range(1,100)  : 
+                        if  flows["priority"] in range(1,101)  : 
                             switchData.append([data2["nodes"]["node"][switch]["id"],flows["priority"]])
                             # print(flows['id'],flows["priority"],flows["match"]["ethernet-match"])
                             if "ethernet-match" in flows["match"]:
@@ -311,13 +311,13 @@ def removeMeter():
         sendData = json.dumps(tempData)
         response = requests.delete(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
         if response.status_code ==200:
-            flash('Meter Removed', category='success')
+            flash('Meter removed successfully', category='success')
             return redirect(url_for('apis.showMeters'))
         else:
-            flash('Meter Removing Error', category='error')
+            flash('Error when removing meter !! Please try again', category='error')
             return redirect(url_for('apis.showMeters'))
     else:
-        flash('Error', category='error')
+        flash('Error when removing meter !! Please try again', category='error')
         return redirect(url_for('apis.showMeters'))
 
 @apis.route('/addMeter', methods=['GET', 'POST'])
@@ -336,10 +336,10 @@ def addMeter():
                 sendData = json.dumps(tempData)
                 response = requests.put(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
             if response.status_code ==201 or response.status_code ==200 :
-                flash('Meter Added', category='success')
+                flash('Meter added successfully', category='success')
                 return redirect(url_for('apis.showMeters'))
             else:
-                flash('Meter Adding Error', category='error')
+                flash('Error when adding meter!! Please try again', category='error')
                 return redirect(url_for('apis.showMeters'))
         else:
             tempData = copy.deepcopy(meterJson)
@@ -350,12 +350,12 @@ def addMeter():
             sendData = json.dumps(tempData)
             response = requests.put(tempDataUrl,auth=HTTPBasicAuth('admin', 'admin'), data=sendData,headers=headers)
             if response.status_code ==201 or response.status_code ==200 :
-                flash('Meter Added', category='success')
+                flash('Meter added successfully', category='success')
                 return redirect(url_for('apis.showMeters'))
             else:
-                flash('Meter Adding Error', category='error')
+                flash('Error when adding meter!! Please try again', category='error')
                 return redirect(url_for('apis.showMeters'))
     else:
-        flash('Error', category='error')
+        flash('Error when adding meter!! Please try again', category='error')
         return redirect(url_for('apis.showMeters'))
         
